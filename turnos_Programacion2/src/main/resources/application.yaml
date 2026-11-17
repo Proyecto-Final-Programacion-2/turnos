@@ -2,6 +2,7 @@ spring:
   application:
     name: turnos_Programacion2
   datasource:
+    # Valores requeridos desde el entorno o Docker Compose; no se versionan credenciales reales.
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
@@ -12,3 +13,14 @@ spring:
     open-in-view: false
 server:
   port: ${SERVER_PORT:8082}
+app:
+  security:
+    jwt:
+      # Debe coincidir con Catalogo para permitir que ambos validen el mismo token HS256.
+      secret: ${JWT_SECRET}
+      issuer: turnos-api
+      # Duracion configurable del token; el codigo exige que sea positiva.
+      expiration-seconds: ${JWT_EXPIRATION_SECONDS:3600}
+    cors:
+      # Lista separada por comas de origenes autorizados para llamadas desde clientes.
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:}
