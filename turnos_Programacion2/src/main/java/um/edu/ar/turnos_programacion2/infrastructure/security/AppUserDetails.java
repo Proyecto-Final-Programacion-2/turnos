@@ -1,42 +1,41 @@
-package um.edu.ar.turnos_programacion2.security;
+package um.edu.ar.turnos_programacion2.infrastructure.security;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import um.edu.ar.turnos_programacion2.user.AppUser;
+import um.edu.ar.turnos_programacion2.domain.user.model.UserAccount;
 
 import java.util.Collection;
 
-// Adaptador entre la entidad de usuario y la interfaz de autenticacion de Spring Security.
 public class AppUserDetails implements UserDetails {
 
-    private final AppUser user;
+    private final UserAccount userAccount;
 
-    public AppUserDetails(AppUser user) {
-        this.user = user;
+    public AppUserDetails(UserAccount userAccount) {
+        this.userAccount = userAccount;
     }
 
-    public AppUser getUser() {
-        return user;
+    public UserAccount getUserAccount() {
+        return userAccount;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return user.getAuthorities().stream().map(SimpleGrantedAuthority::new).toList();
+        return userAccount.authorities().stream().map(SimpleGrantedAuthority::new).toList();
     }
 
     @Override
     public String getPassword() {
-        return user.getPasswordHash();
+        return userAccount.passwordHash();
     }
 
     @Override
     public String getUsername() {
-        return user.getLogin();
+        return userAccount.login();
     }
 
     @Override
     public boolean isEnabled() {
-        return user.isActivated();
+        return userAccount.activated();
     }
 }

@@ -1,9 +1,8 @@
-package um.edu.ar.turnos_programacion2.user;
+package um.edu.ar.turnos_programacion2.infrastructure.web.user;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-// Credenciales recibidas por el endpoint de inicio de sesion.
 public record LoginRequest(
     @NotBlank
     @Size(max = 254)

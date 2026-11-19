@@ -1,6 +1,5 @@
-package um.edu.ar.turnos_programacion2.user;
+package um.edu.ar.turnos_programacion2.domain.user.exception;
 
-// Error funcional que conserva un codigo y el campo duplicado para la respuesta REST.
 public class AccountConflictException extends RuntimeException {
 
     private final String code;

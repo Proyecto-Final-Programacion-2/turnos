@@ -1,4 +1,4 @@
-package um.edu.ar.turnos_programacion2.user;
+package um.edu.ar.turnos_programacion2.infrastructure.persistence.user;
 
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
+import um.edu.ar.turnos_programacion2.domain.user.model.UserAccount;
 
 import java.time.Instant;
 import java.util.HashSet;
@@ -17,8 +18,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "jhi_user")
-// Cuenta de usuario final de la app; no representa la cuenta tecnica de la catedra.
-public class AppUser {
+public class UserAccountJpaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +27,6 @@ public class AppUser {
     @Column(nullable = false, unique = true, length = 50)
     private String login;
 
-    // BCrypt guarda un hash irreversible, nunca la contrasena original.
     @Column(name = "password_hash", nullable = false, length = 60)
     private String passwordHash;
 
@@ -52,7 +51,6 @@ public class AppUser {
     @Column(name = "created_date", nullable = false)
     private Instant createdDate;
 
-    // Las autoridades se guardan en una tabla propia vinculada por user_id.
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
         name = "jhi_user_authority",
@@ -61,30 +59,37 @@ public class AppUser {
     @Column(name = "authority_name", nullable = false, length = 50)
     private Set<String> authorities = new HashSet<>();
 
-    protected AppUser() {
-        // JPA necesita un constructor sin argumentos para reconstruir la entidad.
+    protected UserAccountJpaEntity() {
     }
 
-    public AppUser(
-        String login,
-        String passwordHash,
-        String firstName,
-        String lastName,
-        String email,
-        String imageUrl,
-        String langKey
-    ) {
-        this.login = login;
-        this.passwordHash = passwordHash;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.imageUrl = imageUrl;
-        this.langKey = langKey;
-        // El alta activa inmediatamente la cuenta y asigna un rol basico controlado por el servidor.
-        this.activated = true;
-        this.createdDate = Instant.now();
-        this.authorities.add("ROLE_USER");
+    UserAccountJpaEntity(UserAccount account) {
+        this.id = account.id();
+        this.login = account.login();
+        this.passwordHash = account.passwordHash();
+        this.firstName = account.firstName();
+        this.lastName = account.lastName();
+        this.email = account.email();
+        this.activated = account.activated();
+        this.imageUrl = account.imageUrl();
+        this.langKey = account.langKey();
+        this.createdDate = account.createdDate();
+        this.authorities = new HashSet<>(account.authorities());
+    }
+
+    UserAccount toDomain() {
+        return new UserAccount(
+            id,
+            login,
+            passwordHash,
+            firstName,
+            lastName,
+            email,
+            activated,
+            imageUrl,
+            langKey,
+            createdDate,
+            authorities
+        );
     }
 
     public Long getId() {
@@ -125,9 +130,5 @@ public class AppUser {
 
     public Instant getCreatedDate() {
         return createdDate;
-    }
-
-    public Set<String> getAuthorities() {
-        return Set.copyOf(authorities);
     }
 }

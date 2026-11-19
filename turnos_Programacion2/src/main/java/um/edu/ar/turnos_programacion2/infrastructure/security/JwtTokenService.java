@@ -1,4 +1,4 @@
-package um.edu.ar.turnos_programacion2.security;
+package um.edu.ar.turnos_programacion2.infrastructure.security;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -7,7 +7,8 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.stereotype.Service;
-import um.edu.ar.turnos_programacion2.user.AppUser;
+import um.edu.ar.turnos_programacion2.domain.user.model.UserAccount;
+import um.edu.ar.turnos_programacion2.domain.user.port.out.AccessTokenIssuer;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -15,7 +16,7 @@ import java.util.List;
 
 @Service
 // Crea los JWT de usuario final que despues validan Turnos y Catalogo.
-public class JwtTokenService {
+public class JwtTokenService implements AccessTokenIssuer {
 
     private final JwtEncoder jwtEncoder;
     private final String issuer;
@@ -34,16 +35,17 @@ public class JwtTokenService {
         this.expirationSeconds = expirationSeconds;
     }
 
-    public String createToken(AppUser user) {
+    @Override
+    public String issueFor(UserAccount user) {
         Instant issuedAt = Instant.now();
         // subject identifica el login; user_id y authorities se usan para autorizar y asociar recursos.
         JwtClaimsSet claims = JwtClaimsSet.builder()
             .issuer(issuer)
             .issuedAt(issuedAt)
             .expiresAt(issuedAt.plus(expirationSeconds, ChronoUnit.SECONDS))
-            .subject(user.getLogin())
-            .claim("user_id", user.getId().toString())
-            .claim("authorities", List.copyOf(user.getAuthorities()))
+            .subject(user.login())
+            .claim("user_id", user.id().toString())
+            .claim("authorities", List.copyOf(user.authorities()))
             .build();
         JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
         // Firma HS256 con la clave secreta externa compartida por los dos backends.

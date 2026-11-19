@@ -8,7 +8,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
-import um.edu.ar.turnos_programacion2.user.AppUserRepository;
+import um.edu.ar.turnos_programacion2.infrastructure.persistence.user.SpringDataUserAccountRepository;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,7 +28,7 @@ class TurnosProgramacion2ApplicationTests {
     private MockMvc mockMvc;
 
     @Autowired
-    private AppUserRepository userRepository;
+    private SpringDataUserAccountRepository userRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;

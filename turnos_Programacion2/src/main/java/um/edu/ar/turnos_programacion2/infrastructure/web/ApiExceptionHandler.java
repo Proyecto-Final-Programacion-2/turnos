@@ -1,22 +1,23 @@
-package um.edu.ar.turnos_programacion2.user;
+package um.edu.ar.turnos_programacion2.infrastructure.web;
 
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import um.edu.ar.turnos_programacion2.domain.user.exception.AccountConflictException;
+import um.edu.ar.turnos_programacion2.domain.user.exception.InvalidCredentialsException;
+import um.edu.ar.turnos_programacion2.domain.user.exception.UserAccountNotFoundException;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
 @RestControllerAdvice
-// Traduce errores esperables a respuestas HTTP estables sin exponer detalles internos.
 public class ApiExceptionHandler {
 
     @ExceptionHandler(AccountConflictException.class)
@@ -55,7 +56,7 @@ public class ApiExceptionHandler {
         return ResponseEntity.badRequest().body(problem);
     }
 
-    @ExceptionHandler({InvalidCredentialsException.class, BadCredentialsException.class})
+    @ExceptionHandler(InvalidCredentialsException.class)
     ResponseEntity<ProblemDetail> handleInvalidCredentials() {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(
             HttpStatus.UNAUTHORIZED,
@@ -63,6 +64,17 @@ public class ApiExceptionHandler {
         );
         problem.setTitle("Unauthorized");
         problem.setProperty("code", "INVALID_CREDENTIALS");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problem);
+    }
+
+    @ExceptionHandler(UserAccountNotFoundException.class)
+    ResponseEntity<ProblemDetail> handleMissingAccount() {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+            HttpStatus.UNAUTHORIZED,
+            "Invalid access token"
+        );
+        problem.setTitle("Unauthorized");
+        problem.setProperty("code", "INVALID_ACCESS_TOKEN");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problem);
     }
 
