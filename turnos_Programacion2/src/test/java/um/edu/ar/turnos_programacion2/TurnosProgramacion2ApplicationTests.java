@@ -8,6 +8,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import um.edu.ar.turnos_programacion2.infrastructure.persistence.reservation.SpringDataReservationProcessRepository;
 import um.edu.ar.turnos_programacion2.infrastructure.persistence.user.SpringDataUserAccountRepository;
 
 import java.util.regex.Matcher;
@@ -31,11 +32,14 @@ class TurnosProgramacion2ApplicationTests {
     private SpringDataUserAccountRepository userRepository;
 
     @Autowired
+    private SpringDataReservationProcessRepository reservationProcessRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void cleanUsers() {
-        // Cada caso comienza con la tabla de usuarios vacia.
+        reservationProcessRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -65,6 +69,7 @@ class TurnosProgramacion2ApplicationTests {
         var savedUser = userRepository.findByLogin("alice").orElseThrow();
         assertThat(savedUser.getPasswordHash()).isNotEqualTo("secure-password");
         assertThat(passwordEncoder.matches("secure-password", savedUser.getPasswordHash())).isTrue();
+        assertThat(savedUser.getExternalPatientId()).startsWith("user-");
     }
 
     @Test

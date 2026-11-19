@@ -30,6 +30,9 @@ public class UserAccountJpaEntity {
     @Column(name = "password_hash", nullable = false, length = 60)
     private String passwordHash;
 
+    @Column(name = "external_patient_id", nullable = false, unique = true, length = 100)
+    private String externalPatientId;
+
     @Column(name = "first_name", nullable = false, length = 50)
     private String firstName;
 
@@ -66,6 +69,7 @@ public class UserAccountJpaEntity {
         this.id = account.id();
         this.login = account.login();
         this.passwordHash = account.passwordHash();
+        this.externalPatientId = account.externalPatientId();
         this.firstName = account.firstName();
         this.lastName = account.lastName();
         this.email = account.email();
@@ -81,6 +85,7 @@ public class UserAccountJpaEntity {
             id,
             login,
             passwordHash,
+            externalPatientId,
             firstName,
             lastName,
             email,
@@ -102,6 +107,10 @@ public class UserAccountJpaEntity {
 
     public String getPasswordHash() {
         return passwordHash;
+    }
+
+    public String getExternalPatientId() {
+        return externalPatientId;
     }
 
     public String getFirstName() {

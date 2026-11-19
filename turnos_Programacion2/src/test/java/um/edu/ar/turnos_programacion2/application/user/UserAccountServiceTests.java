@@ -88,6 +88,7 @@ class UserAccountServiceTests {
             7L,
             "alice",
             "bcrypt-hash",
+            "user-test-alice",
             "Alice",
             "Example",
             "alice@example.com",
